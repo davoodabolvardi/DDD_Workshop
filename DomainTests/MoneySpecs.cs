@@ -1,8 +1,8 @@
 using AutoFixture;
 using AutoFixture.Xunit2;
 using FluentAssertions;
-namespace DomainTests;
 
+namespace DomainTests;
 
 public class MoneySpecs
 {
@@ -35,7 +35,6 @@ public class MoneySpecs
         // {
         //     Amount = Math.Abs(with.Amount)
         // });
-
     }
 
     [Theory, AutoData]
@@ -58,4 +57,69 @@ public class MoneySpecs
         .Value.Should().Be(five);
     }
 
+    [Theory, AutoData]
+    public void Supports_plural(uint randomValue)
+    {
+        var firstMoney = aValidMoney();
+        var biggerMoney = PluralFactory(randomValue, firstMoney.Value);
+        var secondMoney = new Money(biggerMoney.Value - firstMoney.Value);
+
+        (firstMoney + secondMoney)
+            
+        .Value.Should().Be(biggerMoney.Value);
+    }
+
+    [Theory, AutoData]
+    public void Support_is_less_than_operator(uint random)
+    {
+        var smallerMoney = aValidMoney();
+        var biggerMoney = new Money(smallerMoney.Value + random);
+
+        (smallerMoney < biggerMoney)
+            
+        .Should().BeTrue();
+    }
+
+    [Theory, AutoData]
+    public void Support_is_greater_than_operator(uint randomValue)
+    {
+        var smallerMoney = aValidMoney();
+        var biggerMoney = new Money(smallerMoney.Value + randomValue);
+
+        (biggerMoney > smallerMoney)
+            
+        .Should().BeTrue();
+    }
+
+    [Fact]
+    public void Support_is_less_than_or_equal_to_operator()
+    {
+        var firstMoney = aValidMoney();
+        var secondMoney = firstMoney;
+
+        (firstMoney <= secondMoney)
+            
+        .Should().BeTrue();
+    }
+
+    [Fact]
+    public void Support_is_greater_than_or_equal_to_operator()
+    {
+        var firstMoney = aValidMoney();
+        var secondMoney = firstMoney;
+
+        (firstMoney >= secondMoney)
+            
+        .Should().BeTrue();
+    }
+
+    private Money PluralFactory(uint randomValue, decimal tempMoneyValue)
+    {
+        if (randomValue < tempMoneyValue)
+        {
+            randomValue += Convert.ToUInt32(tempMoneyValue);
+        }
+
+        return new Money(randomValue);
+    }
 }
